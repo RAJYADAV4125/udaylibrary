@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>UDAY LIBRARY | Jalalpur Jaunpur</title>
+  <style>
+    :root{
+      --primary:#1d4ed8;--primary2:#2563eb;--bg:#f5f7fb;--card:#fff;
+      --text:#172033;--muted:#64748b;--border:#e2e8f0;--green:#059669;
+      --yellow:#f59e0b;--red:#dc2626;--shadow:0 8px 25px rgba(15,23,42,.07);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .topbar{background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;padding:18px 16px}
+    .topbar-inner{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    .brand{font-size:24px;font-weight:800;letter-spacing:.5px}
+    .sub{font-size:13px;opacity:.9;margin-top:3px}
+    .owner{font-size:13px;text-align:right}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .nav{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-bottom:18px}
+    .nav button{border:1px solid var(--border);background:#fff;color:var(--text);padding:10px 16px;border-radius:10px;font-weight:700;white-space:nowrap}
+    .nav button.active,.nav button:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .page{display:none}.page.active{display:block}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+    .stat-label{color:var(--muted);font-size:13px}.stat{font-size:28px;font-weight:800;margin-top:6px}
+    .green{color:var(--green)}.orange{color:var(--yellow)}.red{color:var(--red)}
+    .panel{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+    h2,h3{margin:0}.muted{color:var(--muted)}
+    .btn{border:0;border-radius:10px;padding:9px 13px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+    .btn-primary{background:var(--primary);color:#fff}.btn-green{background:var(--green);color:#fff}
+    .btn-light{background:#eef2ff;color:#1e3a8a}.btn-danger{background:#fee2e2;color:#991b1b}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .filters{display:flex;gap:10px;flex-wrap:wrap}
+    input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:#fff;color:var(--text);outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    .field{margin-bottom:13px}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;min-width:780px}
+    th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--border);font-size:13px;white-space:nowrap}
+    th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
+    .badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+    .badge-res{background:#ede9fe;color:#6d28d9}.badge-un{background:#e0f2fe;color:#0369a1}
+    .badge-paid{background:#dcfce7;color:#166534}.badge-due{background:#fef3c7;color:#92400e}
+    .seat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:9px}
+    .seat{border:1px solid var(--border);border-radius:11px;padding:10px 4px;text-align:center;background:#fff;cursor:pointer}
+    .seat strong{display:block;font-size:15px}.seat small{display:block;margin-top:3px;color:var(--muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .seat.occupied{border-color:#93c5fd;background:#eff6ff}.seat.reserved{border-color:#c4b5fd;background:#f5f3ff}
+    .seat.available{border-color:#86efac;background:#f0fdf4}
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:50;padding:16px;overflow:auto}
+    .modal-backdrop.show{display:flex;align-items:center;justify-content:center}
+    .modal{background:#fff;border-radius:18px;width:min(620px,100%);padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .close{border:0;background:#f1f5f9;border-radius:9px;width:34px;height:34px;font-size:18px}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-start;margin-top:16px}
+    .empty{text-align:center;color:var(--muted);padding:25px}
+    .notice{padding:11px 13px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:12px;margin-bottom:13px}
+    .footer{text-align:center;color:var(--muted);font-size:13px;padding:25px 0}
+    .profile-modal{width:min(820px,100%);max-height:90vh;overflow:auto}.profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.profile-item{padding:12px;border:1px solid var(--border);border-radius:10px;background:#f8fafc}.profile-item b{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+    .history-wrap{margin-top:16px;overflow:auto}.history-wrap table{min-width:550px}
+    .receipt-search{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;align-items:start}
+    .receipt-results{max-height:280px;overflow:auto;border:1px solid var(--border);border-radius:14px;background:#fff}
+    .receipt-result{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+    .receipt-result:last-child{border-bottom:0}.receipt-result:hover,.receipt-result.selected{background:#eff6ff}
+    .receipt-result small{color:var(--muted)}
+    .receipt-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .receipt-preview-wrap{margin-top:20px;border:1px solid #d8e5f2;border-radius:18px;background:#eaf2f9;padding:16px;overflow:auto}
+    .receipt-slip{background:#fff;border:1px dashed #64748b;padding:20px;border-radius:12px;font-family:monospace;max-width:440px;margin:auto}
+    .receipt-slip h3{text-align:center;font-size:18px;margin-bottom:4px}
+    .receipt-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
+    .receipt-total{border-top:1px dashed #cbd5e1;border-bottom:1px dashed #cbd5e1;padding:8px 0;margin:10px 0;font-weight:bold;font-size:15px}
+    @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.receipt-search{grid-template-columns:1fr}}
+    @media(max-width:600px){.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.receipt-form{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div><div class="brand">UDAY LIBRARY</div><div class="sub">JALALPUR JAUNPUR</div></div>
+    <div class="owner">Owner: <strong>Vivek Yadav</strong></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="nav">
+    <button class="active" data-page="home">Home</button>
+    <button data-page="students">Students</button>
+    <button data-page="fees">Fees</button>
+    <button data-page="receipt">Fee Receipt</button>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <section id="home" class="page active">
+    <div class="cards">
+      <div class="card"><div class="stat-label">Total Seats</div><div id="sTotal" class="stat">100</div></div>
+      <div class="card"><div class="stat-label">Occupied</div><div id="sOccupied" class="stat red">0</div></div>
+      <div class="card"><div class="stat-label">Available</div><div id="sAvailable" class="stat green">100</div></div>
+      <div class="card"><div class="stat-label">Pending Due</div><div id="sDue" class="stat orange">0</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>Seat Matrix</h2><div class="muted">Live status of all 100 seats</div></div>
+        <button class="btn btn-primary" onclick="openStudent()">+ Add Student</button>
+      </div>
+      <div id="homeSeats" class="seat-grid"></div>
+    </div>
+  </section>
+
+  <!-- STUDENTS PAGE -->
+  <section id="students" class="page">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>Student Management</h2><div class="muted">Search and manage records</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="openStudent()">+ Add Student</button>
+          <button class="btn btn-light" onclick="exportStudentData()">Backup Data</button>
+          <button class="btn btn-light" onclick="document.getElementById('importStudentFile').click()">Restore Data</button>
+          <input id="importStudentFile" type="file" accept=".json,application/json" style="display:none" onchange="importStudentData(this.files[0])">
+        </div>
+      </div>
+      <div class="filters">
+        <input id="search" placeholder="Search by name, seat no., or mobile..." oninput="renderStudents()" style="max-width:320px">
+        <select id="typeFilter" onchange="renderStudents()" style="max-width:180px"><option value="">All Seat Types</option><option>Unreserved</option><option>Reserved</option></select>
+        <select id="paymentFilter" onchange="renderStudents()" style="max-width:160px"><option value="">All Payments</option><option>Paid</option><option>Due</option></select>
+      </div>
+    </div>
+    <div class="panel table-wrap">
+      <table>
+        <thead>
+          <tr><th>Seat</th><th>Student Name</th><th>Father Name</th><th>Mobile</th><th>Monthly Fee</th><th>Shift / Time</th><th>Validity Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="studentRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FEES PAGE -->
+  <section id="fees" class="page">
+    <div class="cards">
+      <div class="card"><div class="stat-label">Monthly Collection</div><div id="fPaid" class="stat green">₹0</div></div>
+      <div class="card"><div class="stat-label">Pending Amount</div><div id="fDue" class="stat red">₹0</div></div>
+      <div class="card"><div class="stat-label">Paid Students</div><div id="fPaidCount" class="stat">0</div></div>
+      <div class="card"><div class="stat-label">Due Students</div><div id="fDueCount" class="stat">0</div></div>
+    </div>
+    <div class="panel table-wrap">
+      <div class="panel-head"><h2>Fee & Due List</h2><div class="muted">Automatic date-based reminders</div></div>
+      <table>
+        <thead><tr><th>Seat</th><th>Student Name</th><th>Amount</th><th>Validity Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="feeRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RECEIPT PAGE -->
+  <section id="receipt" class="page">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>Fee Receipt Generator</h2><div class="muted">Search or choose student to auto-populate receipt details</div></div>
+      </div>
+      <div class="receipt-search">
+        <div>
+          <div class="field"><label>Search Student</label><input id="receiptSearch" placeholder="Type name, seat, mobile..." oninput="renderReceiptSearch()"></div>
+          <div class="field"><label>Select Student</label><select id="receiptStudentSelect" onchange="selectReceiptStudent(Number(this.value))"><option value="">-- Select Student --</option></select></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-light" type="button" onclick="showAllReceiptStudents()">Show All</button>
+            <button class="btn btn-light" type="button" onclick="clearReceiptStudent()">Clear</button>
+          </div>
+          <div id="receiptResults" class="receipt-results"></div>
+        </div>
+
+        <div>
+          <div class="notice"><b>Selected Student:</b> <span id="receiptSelected">No student selected</span></div>
+          <div class="receipt-form">
+            <div class="field"><label>Receipt Date</label><input id="receiptDate" type="date"></div>
+            <div class="field"><label>Validity Date (New / Update)</label><input id="receiptValidityDate" type="date"></div>
+            <div class="field">
+              <label>Payment Mode</label>
+              <select id="receiptPaymentMode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option></select>
+            </div>
+            <div class="field"><label>Transaction ID</label><input id="receiptTxn" placeholder="Optional for cash"></div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Amount Paid (₹) — Enter Manually (₹400–₹5000)</label>
+              <input id="receiptAmount" type="number" min="400" max="5000" placeholder="Enter amount (₹400–₹5000)">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(400)">₹400</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(500)">₹500</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(1000)">₹1,000</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(1500)">₹1,500</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(2000)">₹2,000</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(3000)">₹3,000</button>
+                <button class="btn btn-light" type="button" onclick="setReceiptAmount(5000)">₹5,000</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="generateReceipt()">Generate & Save Receipt</button>
+            <button class="btn btn-green" onclick="window.print()">Print Receipt</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="receiptPreview" class="receipt-preview-wrap" style="display:none">
+        <div id="printableReceipt" class="receipt-slip">
+          <h3>UDAY LIBRARY</h3>
+          <p style="text-align:center;font-size:12px;margin-bottom:12px">Jalalpur, Jaunpur • Fee Payment Slip</p>
+          <div class="receipt-row"><span>Receipt No:</span><b id="rcptNo">UL-1</b></div>
+          <div class="receipt-row"><span>Date:</span><span id="rcptDate">--</span></div>
+          <div class="receipt-row"><span>Student Name:</span><b id="rcptName">--</b></div>
+          <div class="receipt-row"><span>Seat No:</span><b id="rcptSeat">--</b></div>
+          <div class="receipt-row"><span>Father Name:</span><span id="rcptFather">--</span></div>
+          <div class="receipt-row"><span>Mobile:</span><span id="rcptPhone">--</span></div>
+          <div class="receipt-row"><span>Payment Mode:</span><span id="rcptMode">Cash</span></div>
+          <div class="receipt-row"><span>Validity Date:</span><b id="rcptValidity" style="color:var(--primary)">--</b></div>
+          <div class="receipt-total receipt-row"><span>Total Paid:</span><span id="rcptAmt">₹0</span></div>
+          <p style="text-align:center;font-size:11px;margin-top:10px;color:var(--muted)">UPI: vy87199487@slc</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">© UDAY LIBRARY • Jalalpur Jaunpur</div>
+</main>
+
+<!-- PROFILE MODAL -->
+<div id="profileBackdrop" class="modal-backdrop">
+  <div class="modal profile-modal">
+    <div class="modal-head"><h2>Student Profile</h2><button class="close" onclick="closeStudentProfile()">×</button></div>
+    <div id="profileBody"></div>
+    <div class="modal-actions"><button class="btn btn-light" onclick="closeStudentProfile()">Close</button></div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div id="modalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Add Student</h2><button class="close" onclick="closeModal()">×</button></div>
+    <input type="hidden" id="editIndex">
+    <div class="grid2">
+      <div class="field"><label>Student Name *</label><input id="studentName" placeholder="Full name"></div>
+      <div class="field"><label>Father's Name</label><input id="parentName" placeholder="Father name"></div>
+      <div class="field"><label>Mobile Number (10 Digit)</label><input id="mobile" type="tel" maxlength="10" placeholder="10-digit number"></div>
+      <div class="field"><label>Seat Number (1-100)</label><select id="seatNo"></select></div>
+      <div class="field"><label>Seat Type</label><select id="seatType"><option>Unreserved</option><option>Reserved</option></select></div>
+      <div class="field"><label>Monthly Fee (₹)</label><input id="monthly" type="number" min="400" max="5000" value="500"></div>
+      <div class="field"><label>Shift / Time</label><input id="manualTime" placeholder="e.g. 7 AM - 1 PM"></div>
+      <div class="field"><label>Validity Date</label><input id="validityDate" type="date"></div>
+      <div class="field" style="grid-column:1/-1"><label>Address</label><input id="address" placeholder="Village / Area"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveStudent()">Save Details</button>
+      <button class="btn btn-light" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOTAL_SEATS = 100;
+const STORAGE_KEY = "uday_library_students_v1";
+const RECEIPT_COUNTER_KEY = "uday_receipt_counter_ul_v1";
+
+const MASTER_STUDENT_CONTACTS = [
+  [1, "AMAN YADAV", "KAILASNATH", "", "SEHAMPUR", "2026-10-31"],
+  [2, "AVANISH", "RAMSEVAK", "8881503626", "SEHAMPUR", "2026-10-01"],
+  [4, "ANJU GAUTAM", "SANKAR JAISWAL", "6386868909", "JARI", "2026-09-28"],
+  [5, "SANJANA VISWKARMA", "RAVINDR", "6386248035", "SEHAMPUR", "2026-09-25"],
+  [6, "RIYA VISWAKARMA", "ANIL", "8318707373", "SEHAMPUR", "2026-10-15"],
+  [8, "ANSHU YADAV", "RAMSURAT YADAV", "9230912969", "SEHMAPUR", "2026-10-18"],
+  [10, "RAHUL YADAV", "SUDHAKAR YADAV", "6387158355", "", "2026-07-14"],
+  [11, "RAKESH", "PUSPRAJ", "", "KHALISPUR", "2026-07-15"],
+  [12, "ROHIT YADAV", "LALA YADAV", "", "JALALPUR", "2026-06-28"],
+  [13, "GOPI", "YOGARAJ", "", "JALALPUR", "2026-06-04"],
+  [14, "SURAJ", "RAMPPRASAD", "8423112737", "RASULPUR", "2026-09-08"],
+  [15, "SONA", "JITENDR", "9198646212", "JARI", "2026-09-08"],
+  [16, "PRINCE YADAV", "VIJAY", "9616865386", "MANGAHAN", "2026-09-18"],
+  [17, "SHIVAM", "PULLU", "6388180159", "BHOGARI", "2026-09-29"],
+  [18, "ATUL SINGH", "PRAVESH", "8318707207", "JARI", "2026-09-25"],
+  [19, "AYUSH YADAV", "SANJAY", "6306680528", "SEHAMPUR", "2026-10-04"],
+  [20, "AMAN YADAV", "RAMCHANDR", "8172948941", "SEHAMPUR", "2026-09-19"],
+  [21, "ANKIT YADAV", "SUNIL YADAV", "9569428126", "SEHAMPUR", "2026-09-19"],
+  [22, "VIKASH YADAV", "RAMAWADH", "9580944582", "SEHAMPUR", "2026-10-19"],
+  [23, "AMAN YADAV", "PRADIP YADAV", "8090889843", "SEHAMPUR", "2026-09-10"],
+  [24, "SHASHI MAURYA", "SABHAJEET", "9235990622", "", "2026-09-01"],
+  [25, "PANKAJ", "ARVIND", "8087676603", "BHOGARI", "2026-09-21"],
+  [26, "ANSHU YADAV", "DINESH", "7379148644", "SEHAMPUR", "2026-09-16"],
+  [27, "ANUPAM", "SRIPRAKASH", "7081910876", "SEHAMPUR", "2026-10-16"],
+  [28, "SHANI YADAV", "", "9651007989", "BHOGARI", "2026-07-15"],
+  [31, "AKASH YADAV", "SUNIL", "7565839027", "", "2026-10-10"],
+  [32, "MD.SHAMS", "RAFIQ", "8948571134", "RASULPUR", "2026-09-30"],
+  [33, "SATYAM YADAV", "DILIP YADAV", "6394486837", "TALAMPUR", "2026-09-05"],
+  [34, "SHIVMOHAN", "SURENDR", "", "JARI", "2026-09-05"],
+  [35, "SHRUTI YADAV", "RAMVILASH YADAV", "9856432181", "SEHAMPUR", "2026-10-21"],
+  [36, "SANDHYA YADAV", "RAMHIT", "7393031121", "MANGAHAN", "2026-09-20"],
+  [37, "KISAN YADAV", "DINESH", "9415356118", "SEHAMPUR", "2026-09-23"],
+  [38, "SAURABH YADAV", "DINESH", "9461132852", "SEHAMPUR", "2026-09-15"],
+  [39, "RAGINI", "UMANATH", "6394464773", "", "2026-07-15"],
+  [40, "ANNU YADAV", "SHARADA", "9196068318", "SEHAMPUR", "2026-09-05"],
+  [41, "ANSHU YADAV", "SUBASH", "", "BHOGARI", "2026-08-27"],
+  [42, "PRINCE YADAV", "RAMESH", "", "SEHAMPUR", "2026-09-29"],
+  [43, "ARPIT", "BRAJESH", "9794592698", "SEHMAPUR", "2026-10-11"],
+  [44, "AMIT YADAV", "", "", "JARI", "2026-08-06"],
+  [45, "SURAJ YADAV", "SAILENDRA", "8318950658", "SEHAMPUR", "2026-07-15"],
+  [46, "ASTITVA", "LALATA", "", "SEHAMPUR", "2026-08-14"],
+  [47, "SURAJ", "SAMARJEET", "", "BRAHMKI TAND", "2026-09-25"],
+  [48, "AMAN", "", "8881045180", "SEHAMPUR", "2026-06-25"],
+  [49, "SHIVAM", "SANJEET", "", "KHALISPUR", "2026-09-11"],
+  [50, "MAHESH", "SRIPRAKASH", "6306105583", "KHALISPUR", "2026-10-11"],
+  [51, "AMIT", "RAMCHANDRA", "9935403143", "SEHAMPUR", "2026-09-19"],
+  [52, "GAURAV SONKAR", "GURUCHARAN SONKAR", "6387424131", "SEHAMPUR", "2026-07-30"],
+  [53, "KISAN", "ANGANU", "9151243083", "SEHAMPUR", "2026-09-30"],
+  [54, "SAILESH SAROJ", "JAYKUMAR", "7905918121", "BIBANMAU", "2026-09-06"],
+  [55, "NEHA", "LALA", "", "KHALISPUR", "2026-08-27"],
+  [56, "AJAY YADAV", "AMARBAHADUR", "9455672216", "BHOGARI", "2026-09-16"],
+  [57, "DIPU SAROJ", "TEJBAHADUR", "", "SEHAMPUR", "2026-09-11"],
+  [58, "KAJAL", "MURAT", "", "KHALISPUR", "2026-08-27"],
+  [59, "ALKA YADAV", "GYANENDRA", "8400083603", "SEHAMPUR", "2026-10-20"],
+  [60, "SANDHYA YADAV", "VINOD KUMAR", "", "SEHAMPUR", "2026-08-22"],
+  [61, "SHWETA SAROJ", "JITTAN SAROJ", "", "KHALISPUR", "2026-08-17"],
+  [62, "PRITEE", "VINOD KUMAR", "9335978595", "SEHAMPUR", "2026-08-21"],
+  [63, "RAJ YADAV", "", "", "", "2026-07-15"],
+  [64, "SAKSHI PRAJAPATI", "RAMESHCHAND PRAJAPATI", "7359211621", "KADARI", "2026-10-05"],
+  [65, "KHUSBU YADAV", "LALA YADAV", "", "KHALISPUR", "2026-08-17"]
+];
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function normalizeStudents(list){
+  if(!Array.isArray(list)) return [];
+  return list.filter(s=>s && (s.name || s.studentName) && s.seat!=null).map(s=>({
+    name:String(s.name || s.studentName || "").trim(),
+    parent:String(s.parent || s.fatherName || s.father || "").trim(),
+    mobile:String(s.mobile || s.phone || "").trim(),
+    address:String(s.address || "").trim(),
+    validityDate:String(s.validityDate || s.dueDate || ""),
+    seat:Number(s.seat),
+    type:String(s.type || s.seatType || "Unreserved"),
+    monthly:Number(s.monthly || s.monthlyPayment || 500) || 500,
+    time:String(s.time || s.manualTime || "").trim(),
+    status:String(s.status || "Due"),
+    paymentHistory:Array.isArray(s.paymentHistory)?s.paymentHistory:[]
+  })).filter(s=>Number.isFinite(s.seat) && s.seat>=1 && s.seat<=TOTAL_SEATS);
+}
+
+function loadInitialData(){
+  let local = [];
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) local = normalizeStudents(JSON.parse(raw));
+  }catch(e){}
+  
+  if(!local.length){
+    local = MASTER_STUDENT_CONTACTS.map(([seat, name, parent, mobile, address, validityDate])=>({
+      name, parent, mobile, address, validityDate, seat,
+      type: "Unreserved", monthly: 500, time: "",
+      status: validityDate ? (validityDate <= todayISO() ? "Due" : "Paid") : "Due",
+      paymentHistory: []
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
+  }
+  return local;
+}
+
+let students = loadInitialData();
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+  renderAll();
+}
+
+function esc(v){ return String(v ?? "").replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.page).classList.add("active");
+    if(btn.dataset.page==='receipt'){
+      populateReceiptStudentSelect();
+      document.getElementById("receiptDate").value = todayISO();
+    }
+  });
+});
+
+function openStudent(index=-1){
+  const used = new Set(students.map(s=>Number(s.seat)));
+  const select = document.getElementById("seatNo");
+  select.innerHTML = "";
+  for(let i=1;i<=TOTAL_SEATS;i++){
+    if(index>=0 && Number(students[index].seat)===i || !used.has(i)){
+      const o=document.createElement("option"); o.value=i; o.textContent=`Seat ${i}`; select.appendChild(o);
+    }
+  }
+  document.getElementById("editIndex").value=index;
+  document.getElementById("modalTitle").textContent = index>=0 ? "Edit Student" : "Add Student";
+  if(index>=0){
+    const s=students[index];
+    document.getElementById("studentName").value=s.name||"";
+    document.getElementById("parentName").value=s.parent||"";
+    document.getElementById("mobile").value=s.mobile||"";
+    document.getElementById("address").value=s.address||"";
+    document.getElementById("validityDate").value=s.validityDate||"";
+    select.value=s.seat;
+    document.getElementById("seatType").value=s.type||"Unreserved";
+    document.getElementById("monthly").value=s.monthly || 500;
+    document.getElementById("manualTime").value=s.time||"";
+  }else{
+    document.getElementById("studentName").value="";
+    document.getElementById("parentName").value="";
+    document.getElementById("mobile").value="";
+    document.getElementById("address").value="";
+    document.getElementById("validityDate").value="";
+    document.getElementById("seatType").value="Unreserved";
+    document.getElementById("monthly").value=500;
+    document.getElementById("manualTime").value="";
+  }
+  document.getElementById("modalBackdrop").classList.add("show");
+}
+
+function closeModal(){ document.getElementById("modalBackdrop").classList.remove("show"); }
+
+function saveStudent(){
+  const name=document.getElementById("studentName").value.trim();
+  const parent=document.getElementById("parentName").value.trim();
+  const mobile=document.getElementById("mobile").value.trim();
+  const validityDate=document.getElementById("validityDate").value;
+  const seat=Number(document.getElementById("seatNo").value);
+  if(!name){alert("Student ka naam likhein.");return;}
+  const monthly=Number(document.getElementById("monthly").value);
+  if(monthly<400 || monthly>5000){alert("Fee ₹400 se ₹5,000 ke beech honi chahiye.");return;}
+
+  const idx=Number(document.getElementById("editIndex").value);
+  const old=idx>=0?students[idx]:{};
+  const item={
+    name, parent, mobile,
+    address:document.getElementById("address").value.trim(),
+    seat,
+    type:document.getElementById("seatType").value,
+    monthly,
+    time:document.getElementById("manualTime").value.trim(),
+    validityDate,
+    status: validityDate ? (validityDate<=todayISO() ? "Due" : "Paid") : "Due",
+    paymentHistory: Array.isArray(old.paymentHistory) ? old.paymentHistory : []
+  };
+
+  if(idx>=0) students[idx]=item;
+  else students.push(item);
+  students.sort((a,b)=>a.seat-b.seat);
+  saveData();
+  closeModal();
+}
+
+function deleteStudent(index){
+  if(confirm("Kya aap sach me is student ko delete karna chahte hain?")){
+    students.splice(index,1);
+    saveData();
+  }
+}
+
+function openStudentProfile(index){
+  const s = students[index];
+  if(!s) return;
+  const hist = s.paymentHistory || [];
+  const histHtml = hist.length ? `
+    <table style="width:100%;margin-top:8px">
+      <thead><tr><th>Receipt No</th><th>Date</th><th>Amount</th><th>Mode</th><th>Validity</th></tr></thead>
+      <tbody>
+        ${hist.map(h=>`<tr><td><b>${esc(h.receiptNo)}</b></td><td>${esc(h.date)}</td><td>₹${esc(h.amount)}</td><td>${esc(h.mode)}</td><td>${esc(h.validityDate||"-")}</td></tr>`).join("")}
+      </tbody>
+    </table>
+  ` : `<div class="empty">Koi receipt history nahi hai.</div>`;
+
+  document.getElementById("profileBody").innerHTML = `
+    <div class="profile-grid">
+      <div class="profile-item"><b>Student Name</b>${esc(s.name)}</div>
+      <div class="profile-item"><b>Seat Number</b>Seat ${s.seat} (${esc(s.type)})</div>
+      <div class="profile-item"><b>Father's Name</b>${esc(s.parent||"Not set")}</div>
+      <div class="profile-item"><b>Mobile Number</b>${esc(s.mobile||"Not set")}</div>
+      <div class="profile-item"><b>Monthly Fee</b>₹${s.monthly}</div>
+      <div class="profile-item"><b>Validity Date</b>${s.validityDate||"Not set"}</div>
+      <div class="profile-item"><b>Current Status</b><span class="badge ${s.status==='Paid'?'badge-paid':'badge-due'}">${s.status}</span></div>
+      <div class="profile-item"><b>Address</b>${esc(s.address||"Not set")}</div>
+    </div>
+    <div class="history-wrap">
+      <h3 style="margin-top:14px">Payment & Receipt History</h3>
+      ${histHtml}
+    </div>
+  `;
+  document.getElementById("profileBackdrop").classList.add("show");
+}
+
+function closeStudentProfile(){ document.getElementById("profileBackdrop").classList.remove("show"); }
+
+// AUTOMATIC DUE MONTHS CALCULATION
+function getDueMonths(s){
+  const nextDueStr = s.validityDate || "";
+  if(!nextDueStr) return 1;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const nextDue = new Date(nextDueStr + "T00:00:00");
+  if(nextDue > today) return 0;
+  let months = (today.getFullYear() - nextDue.getFullYear()) * 12 + (today.getMonth() - nextDue.getMonth());
+  if(today.getDate() >= nextDue.getDate()) months += 1;
+  return Math.max(1, months);
+}
+
+// CLEAN WHATSAPP REMINDER (AMOUNT AUTOMATIC MULTIPLIED, NO MONTH NAMES LIST)
+function sendReminder(index){
+  const s = students[index];
+  if(!s) return;
+  if(!s.mobile){ alert("Student ka mobile number save nahi hai."); return; }
+
+  const monthly = Number(s.monthly) || 0;
+  const monthsDue = Math.max(1, getDueMonths(s));
+  const totalDue = monthly * monthsDue;
+
+  const msg = `फीस रिमाइंडर\n\nनमस्ते ${s.name},\nआपकी UDAY LIBRARY की फीस बकाया है।\nकुल बकाया: ₹${totalDue.toLocaleString("en-IN")} (${monthsDue} महीने)\nसीट नंबर: ${s.seat}\nकृपया बकाया फीस जल्द जमा करें।\nधन्यवाद।\n\nउदय लाइब्रेरी`;
+  
+  window.open("https://wa.me/91" + s.mobile + "?text=" + encodeURIComponent(msg), "_blank");
+}
+
+function renderStats(){
+  const occupied=students.length;
+  const due=students.filter(s=>s.status!=="Paid");
+  document.getElementById("sTotal").textContent=TOTAL_SEATS;
+  document.getElementById("sOccupied").textContent=occupied;
+  document.getElementById("sAvailable").textContent=TOTAL_SEATS-occupied;
+  document.getElementById("sDue").textContent=due.length;
+
+  const paid=students.filter(s=>s.status==="Paid");
+  document.getElementById("fPaid").textContent="₹"+paid.reduce((a,s)=>a+Number(s.monthly||0),0).toLocaleString("en-IN");
+  
+  // Pending amount multiplies automatically by months
+  const pendingAmount = due.reduce((a,s)=> a + (Number(s.monthly||0) * Math.max(1, getDueMonths(s))), 0);
+  document.getElementById("fDue").textContent="₹"+pendingAmount.toLocaleString("en-IN");
+  
+  document.getElementById("fPaidCount").textContent=paid.length;
+  document.getElementById("fDueCount").textContent=due.length;
+}
+
+function renderSeats(){
+  const map=new Map(students.map(s=>[Number(s.seat),s]));
+  let html="";
+  for(let i=1;i<=TOTAL_SEATS;i++){
+    const s=map.get(i);
+    if(s){
+      const cls=s.type==="Reserved"?"reserved":"occupied";
+      const idx=students.indexOf(s);
+      html+=`<div class="seat ${cls}" onclick="openStudent(${idx})"><strong>${i}</strong><small>${esc(s.name)}</small></div>`;
+    }else{
+      html+=`<div class="seat available" onclick="openStudent()"><strong>${i}</strong><small>Empty</small></div>`;
+    }
+  }
+  document.getElementById("homeSeats").innerHTML=html;
+}
+
+function renderStudents(){
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const tf=document.getElementById("typeFilter").value;
+  const pf=document.getElementById("paymentFilter").value;
+  const filtered=students.map((s,i)=>({s,i})).filter(({s})=>
+    (!q || [s.name,s.parent,s.mobile,s.address,String(s.seat)].join(" ").toLowerCase().includes(q)) &&
+    (!tf || s.type===tf) &&
+    (!pf || s.status===pf)
+  );
+
+  document.getElementById("studentRows").innerHTML=filtered.length?filtered.map(({s,i})=>`
+    <tr>
+      <td><b>Seat ${s.seat}</b></td>
+      <td><b>${esc(s.name)}</b></td>
+      <td>${esc(s.parent||"-")}</td>
+      <td>${esc(s.mobile||"-")}</td>
+      <td>₹${s.monthly}</td>
+      <td>${esc(s.time||"-")}</td>
+      <td>${s.validityDate||"Not set"}</td>
+      <td><span class="badge ${s.status==='Paid'?'badge-paid':'badge-due'}">${s.status}</span></td>
+      <td>
+        <button class="btn btn-light" onclick="openStudent(${i})">Edit</button>
+        <button class="btn btn-light" onclick="openStudentProfile(${i})">Profile</button>
+        <button class="btn btn-light" onclick="sendReminder(${i})">Reminder</button>
+        <button class="btn btn-danger" onclick="deleteStudent(${i})">Delete</button>
+      </td>
+    </tr>
+  `).join(""):`<tr><td colspan="9" class="empty">Koi student nahi mila.</td></tr>`;
+}
+
+function renderFees(){
+  document.getElementById("feeRows").innerHTML=students.map((s,i)=>{
+    const dueMonths = Math.max(1, getDueMonths(s));
+    const totalDue = Number(s.monthly||0) * dueMonths;
+    return `
+      <tr>
+        <td><b>Seat ${s.seat}</b></td>
+        <td>${esc(s.name)}</td>
+        <td>₹${s.status==='Paid' ? s.monthly : totalDue.toLocaleString("en-IN") + ' (' + dueMonths + ' mo)'}</td>
+        <td>${s.validityDate||"Not set"}</td>
+        <td><span class="badge ${s.status==='Paid'?'badge-paid':'badge-due'}">${s.status}</span></td>
+        <td>
+          <button class="btn btn-light" onclick="sendReminder(${i})">WhatsApp</button>
+          <button class="btn btn-green" onclick="toggleFeeStatus(${i})">${s.status==='Paid'?'Mark Due':'Mark Paid'}</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function toggleFeeStatus(index){
+  const s=students[index];
+  if(s.status==="Paid"){
+    s.status="Due";
+  }else{
+    const d=new Date(); d.setMonth(d.getMonth()+1);
+    s.validityDate=d.toISOString().slice(0,10);
+    s.status="Paid";
+  }
+  saveData();
+}
+
+// RECEIPT SECTION LOGIC
+let selectedReceiptIndex = -1;
+
+function populateReceiptStudentSelect(){
+  const sel=document.getElementById("receiptStudentSelect");
+  sel.innerHTML='<option value="">-- Select Student --</option>'+students.map((s,i)=>`<option value="${i}">Seat ${s.seat} - ${esc(s.name)}</option>`).join("");
+}
+
+function showAllReceiptStudents(){
+  document.getElementById("receiptSearch").value="";
+  const box=document.getElementById("receiptResults");
+  box.innerHTML=students.map((s,i)=>`
+    <div class="receipt-result ${i===selectedReceiptIndex?'selected':''}" onclick="selectReceiptStudent(${i})">
+      <div><b>${esc(s.name)}</b><br><small>Seat ${s.seat} • Mobile: ${esc(s.mobile||"N/A")}</small></div>
+      <span class="badge ${s.status==='Paid'?'badge-paid':'badge-due'}">${s.status}</span>
+    </div>
+  `).join("");
+}
+
+function renderReceiptSearch(){
+  const q=(document.getElementById("receiptSearch").value||"").trim().toLowerCase();
+  const box=document.getElementById("receiptResults");
+  if(!q){ showAllReceiptStudents(); return; }
+  const matches=students.map((s,i)=>({s,i})).filter(({s})=>[s.name,s.parent,s.mobile,String(s.seat)].join(" ").toLowerCase().includes(q));
+  box.innerHTML=matches.length?matches.map(({s,i})=>`
+    <div class="receipt-result ${i===selectedReceiptIndex?'selected':''}" onclick="selectReceiptStudent(${i})">
+      <div><b>${esc(s.name)}</b><br><small>Seat ${s.seat} • Mobile: ${esc(s.mobile||"N/A")}</small></div>
+      <span class="badge ${s.status==='Paid'?'badge-paid':'badge-due'}">${s.status}</span>
+    </div>
+  `).join(""):'<div class="empty">Koi student nahi mila.</div>';
+}
+
+function clearReceiptStudent(){
+  selectedReceiptIndex=-1;
+  document.getElementById("receiptSearch").value="";
+  document.getElementById("receiptStudentSelect").value="";
+  document.getElementById("receiptSelected").textContent="No student selected";
+  document.getElementById("receiptAmount").value="";
+  document.getElementById("receiptValidityDate").value="";
+  document.getElementById("receiptPreview").style.display="none";
+  showAllReceiptStudents();
+}
+
+function setReceiptAmount(amt){
+  document.getElementById("receiptAmount").value = amt;
+}
+
+// AUTO-FILL VALIDITY DATE ON SELECT
+function selectReceiptStudent(index){
+  const s=students[index];
+  if(!s) return;
+  selectedReceiptIndex=index;
+  document.getElementById("receiptStudentSelect").value=String(index);
+  document.getElementById("receiptSelected").innerHTML=`<b>${esc(s.name)}</b> (Seat ${s.seat})`;
+  document.getElementById("receiptAmount").value=s.monthly;
+  document.getElementById("receiptValidityDate").value=s.validityDate||"";
+  document.getElementById("receiptDate").value=todayISO();
+}
+
+// RECEIPT GENERATION & AUTO PROFILE HISTORY UPDATE
+function generateReceipt(){
+  if(selectedReceiptIndex<0){alert("Pehle student select karein.");return;}
+  const s=students[selectedReceiptIndex];
+  const amt=Number(document.getElementById("receiptAmount").value);
+  if(!amt || amt<400 || amt>5000){alert("Fee ₹400 se ₹5,000 ke beech honi chahiye.");return;}
+
+  let counter=Number(localStorage.getItem(RECEIPT_COUNTER_KEY)||0)+1;
+  localStorage.setItem(RECEIPT_COUNTER_KEY,String(counter));
+  const rcptNo = "UL-" + counter;
+  const rcptDate = document.getElementById("receiptDate").value || todayISO();
+  const newValidity = document.getElementById("receiptValidityDate").value;
+  const mode = document.getElementById("receiptPaymentMode").value;
+  const txn = document.getElementById("receiptTxn").value.trim();
+
+  // Student update karein
+  if(newValidity){
+    s.validityDate = newValidity;
+    s.status = newValidity <= todayISO() ? "Due" : "Paid";
+  }else{
+    s.status = "Paid";
+  }
+
+  // Profile history me add karein
+  if(!Array.isArray(s.paymentHistory)) s.paymentHistory = [];
+  s.paymentHistory.push({
+    receiptNo: rcptNo,
+    date: rcptDate,
+    amount: amt,
+    mode: mode,
+    transactionId: txn,
+    validityDate: s.validityDate
+  });
+
+  saveData();
+
+  // Receipt Slip update karein
+  document.getElementById("rcptNo").textContent = rcptNo;
+  document.getElementById("rcptDate").textContent = rcptDate;
+  document.getElementById("rcptName").textContent = s.name;
+  document.getElementById("rcptSeat").textContent = s.seat;
+  document.getElementById("rcptFather").textContent = s.parent || "-";
+  document.getElementById("rcptPhone").textContent = s.mobile || "-";
+  document.getElementById("rcptMode").textContent = mode;
+  document.getElementById("rcptValidity").textContent = s.validityDate || "Not set";
+  document.getElementById("rcptAmt").textContent = "₹" + amt.toLocaleString("en-IN");
+
+  document.getElementById("receiptPreview").style.display="block";
+}
+
+// BACKUP & RESTORE
+function exportStudentData(){
+  const blob=new Blob([JSON.stringify(students,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`uday-library-backup-${todayISO()}.json`;
+  a.click();
+}
+
+function importStudentData(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const imported=normalizeStudents(JSON.parse(reader.result));
+      if(!imported.length){alert("Valid student data nahi mila.");return;}
+      students=imported;
+      saveData();
+      alert("Data successfully restore ho gaya!");
+    }catch(e){alert("File import nahi ho saki.");}
+  };
+  reader.readAsText(file);
+}
+
+function renderAll(){
+  renderStats();
+  renderSeats();
+  renderStudents();
+  renderFees();
+}
+
+renderAll();
+</script>
+</body>
+</html>
